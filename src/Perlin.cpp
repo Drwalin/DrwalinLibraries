@@ -17,20 +17,19 @@ Noise & Perlin::GetNoise()
 	return this->noise;
 }
 
-float Perlin::Interpolate( float t, float a, float b )
+inline float Perlin::FractionPositive( float value )
 {
-	if( t > 1 || t < 0 )
-		printf( "\n t = %f", t );
+	return value - floor(value);
+}
+
+inline float Perlin::Interpolate( float t, float a, float b )
+{
 	const float PI = 3.141592f;
 	float f = (sin((t-0.5f)*PI)+1.0f)*0.5f;
 	return (a*f) + (b*(1.0f-f));
 }
 
-/*
-    a c
-    b d
-*/
-float Perlin::Interpolate( float tx, float ty, float a, float b, float c, float d )
+inline float Perlin::Interpolate( float tx, float ty, float a, float b, float c, float d )
 {
 	return Perlin::Interpolate( tx, Interpolate(ty,a,b), Interpolate(ty,c,d) );
 }
@@ -48,24 +47,21 @@ float Perlin::Noise( float _x, float _y )
 	float mult = 1.0f;
 	float _exp = 0.7f;
 	
-	float sum = 0.0f;
-	
 	for( int i = 0; i < this->octaves; ++i, mult *= _exp, _exp *= 0.97f )
 	{
 		x = (int64_t)floor( _x * float(1<<i) );
 		y = (int64_t)floor( _y * float(1<<i) );
 		
 		float a, b, c, d;
-		a = this->noise.GetRandomFloat( (x + this->octaveOffsetX[i]), (y + this->octaveOffsetY[i]), -1.0f, 1.0f );
-		b = this->noise.GetRandomFloat( (x + this->octaveOffsetX[i]), (y+1 + this->octaveOffsetY[i]), -1.0f, 1.0f );
-		c = this->noise.GetRandomFloat( (x+1 + this->octaveOffsetX[i]), (y + this->octaveOffsetY[i]), -1.0f, 1.0f );
-		d = this->noise.GetRandomFloat( (x+1 + this->octaveOffsetX[i]), (y+1 + this->octaveOffsetY[i]), -1.0f, 1.0f );
+		a = this->noise.GetRandomFloat( (x + this->octaveOffsetX[i]), (y + this->octaveOffsetY[i]), -mult, mult );
+		b = this->noise.GetRandomFloat( (x + this->octaveOffsetX[i]), (y+1 + this->octaveOffsetY[i]), -mult, mult );
+		c = this->noise.GetRandomFloat( (x+1 + this->octaveOffsetX[i]), (y + this->octaveOffsetY[i]), -mult, mult );
+		d = this->noise.GetRandomFloat( (x+1 + this->octaveOffsetX[i]), (y+1 + this->octaveOffsetY[i]), -mult, mult );
 		
-		value += Perlin::Interpolate( modf(_x*float(1<<i),NULL), modf(_y*float(1<<i),NULL), d, c, b, a ) * mult;
-		sum += mult;
+		value += Perlin::Interpolate( Perlin::FractionPositive(_x*float(1<<i)), Perlin::FractionPositive(_y*float(1<<i)), d, c, b, a );
 	}
 	
-	return (value+(sum*0.375f))/(sum*0.75f);
+	return value;
 }
 
 void Perlin::Seed( uint64_t seed, int octaves )

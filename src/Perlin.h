@@ -26,8 +26,9 @@ public:
 	
 	Noise & GetNoise();
 	
-	static float Interpolate( float t, float a, float b );
-	static float Interpolate( float tx, float ty, float a, float b, float c, float d );
+	inline static float FractionPositive( float value );
+	inline static float Interpolate( float t, float a, float b );
+	inline static float Interpolate( float tx, float ty, float a, float b, float c, float d );
 	float Noise( float _x, float _y );
 	
 	void Seed( uint64_t seed, int octaves );
