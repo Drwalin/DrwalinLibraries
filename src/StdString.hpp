@@ -51,8 +51,8 @@ namespace std
 	template < typename T >
 	inline string to_string( const vector<T> & src ) ONE_ARG_CODE;
 	
-	template < typename T, int count >
-	inline string to_string( const array<T,count> & src ) ONE_ARG_CODE;
+	template < typename T, size_t size >
+	inline string to_string( const array<T,size> & src ) ONE_ARG_CODE;
 	
 	template < typename T >
 	inline string to_string( const set<T> & src ) ONE_ARG_CODE;
@@ -65,6 +65,9 @@ namespace std
 	
 	template < typename T >
 	inline string to_string( const unordered_multiset<T> & src ) ONE_ARG_CODE;
+	
+	template < typename T, size_t size >
+	inline string to_string( const array<T,size> & src ) ONE_ARG_CODE;
 	
 	#undef ONE_ARG_CODE
 	
